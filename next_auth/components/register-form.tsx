@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CardWrapper } from "./card-wrapper";
 import * as z from "zod";
-import { loginSchema } from "@/schemas";
 import { useState, useTransition } from "react";
 
 import {
@@ -19,13 +18,16 @@ import { Button } from "./ui/button";
 import { FormError } from "./form-error";
 import { FormSuccess } from "./form-success";
 import { login } from "@/actions/action";
+import { RegisterSchema } from "@/schemas";
+import { register } from "@/actions/register";
 
-export const LoginForm = () => {
-  const form = useForm<z.infer<typeof loginSchema>>({
-    resolver: zodResolver(loginSchema),
+export const RegisterForm = () => {
+  const form = useForm<z.infer<typeof RegisterSchema>>({
+    resolver: zodResolver(RegisterSchema),
     defaultValues: {
       email: "",
       password: "",
+      name: "",
     },
   });
 
@@ -36,7 +38,7 @@ export const LoginForm = () => {
     setError("");
     setSuccess("");
     startTransition(async () => {
-      login(values).then((res) => {
+      register(values).then((res) => {
         setError(res.error);
         setSuccess(res.success);
       });
@@ -46,13 +48,29 @@ export const LoginForm = () => {
   console.log(error, success);
   return (
     <CardWrapper
-      headerLabel="Welcome back"
-      backButtonLabel="Don't have an account?"
-      backButtonHref="/auth/register"
+      headerLabel="Create an account"
+      backButtonLabel="Already have an account?"
+      backButtonHref="/auth/login"
       showSocial
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="John Doe" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
           <div className="space-y-4">
             <FormField
               control={form.control}
@@ -91,7 +109,7 @@ export const LoginForm = () => {
           <FormError message={error} />
           <FormSuccess message={success} />
           <Button type="submit" className="w-full">
-            Login
+            Create an account
           </Button>
         </form>
       </Form>
